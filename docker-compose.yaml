@@ -1,0 +1,30 @@
+version: '3.8'
+services:
+
+  mysql:
+    container_name: mysql_db_customer
+    image: mysql:8.0.32
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: db_customer
+    volumes:
+      - mysql_db_customer:/var/lib/mysql
+    networks:
+      - customer-net
+    healthcheck:
+      test: "/usr/bin/mysql --user=root --password=password --execute \"SHOW DATABASES;\""
+      interval: 2s
+      timeout: 20s
+      retries: 10
+
+volumes:
+  mysql_db_customer:
+    external: false
+
+networks:
+  customer-net:
