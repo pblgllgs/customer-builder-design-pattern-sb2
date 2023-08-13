@@ -1,5 +1,8 @@
 package com.pblgllgs.customer.exception;
 
+import com.pblgllgs.customer.dto.response.ApiResponse;
+import com.pblgllgs.customer.dto.response.ResponseBuilder;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -17,7 +20,10 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 @ControllerAdvice
+@RequiredArgsConstructor
 public class ApiExceptionHandler {
+
+    private final ResponseBuilder responseBuilder;
 
     public static ApiErrorResponse contentException(
             HttpServletRequest request,
@@ -34,97 +40,103 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(BadRequestException.class)
     @ResponseBody
-    public ResponseEntity<ApiErrorResponse> handleBadRequestException(
+    public ResponseEntity<ApiResponse> handleBadRequestException(
             BadRequestException e,
             HttpServletRequest request
     ) {
-        return new ResponseEntity<>(
+        return responseBuilder.buildResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                "Ha ocurrido un error",
                 contentException(
                         request,
                         e.getMessage(),
                         HttpStatus.BAD_REQUEST.value()
-                ),
-                HttpStatus.BAD_REQUEST
+                )
         );
     }
 
     @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
     @ResponseBody
-    public ResponseEntity<ApiErrorResponse> handleBadRequestException(
+    public ResponseEntity<ApiResponse> handleBadRequestException(
             SQLIntegrityConstraintViolationException e,
             HttpServletRequest request
     ) {
-        return new ResponseEntity<>(
+        return responseBuilder.buildResponse(
+                HttpStatus.CONFLICT.value(),
+                "Error en la integridad de la DB",
                 contentException(
                         request,
                         e.getMessage(),
                         HttpStatus.CONFLICT.value()
-                ),
-                HttpStatus.CONFLICT
+                )
         );
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     @ResponseBody
-    public ResponseEntity<ApiErrorResponse> handleBadRequestException(
+    public ResponseEntity<ApiResponse> handleBadRequestException(
             ResourceNotFoundException e,
             HttpServletRequest request
     ) {
-        return new ResponseEntity<>(
+        return responseBuilder.buildResponse(
+                HttpStatus.NOT_FOUND.value(),
+                "Recurso no encontrado",
                 contentException(
                         request,
                         e.getMessage(),
                         HttpStatus.NOT_FOUND.value()
-                ),
-                HttpStatus.NOT_FOUND
+                )
         );
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseBody
-    public ResponseEntity<ApiErrorResponse> handleBadRequestException(
+    public ResponseEntity<ApiResponse> handleBadRequestException(
             IllegalArgumentException e,
             HttpServletRequest request
     ) {
-        return new ResponseEntity<>(
+        return responseBuilder.buildResponse(
+                HttpStatus.CONFLICT.value(),
+                "Debe entregar un email para hacer la búsqueda",
                 contentException(
                         request,
                         e.getMessage(),
                         HttpStatus.CONFLICT.value()
-                ),
-                HttpStatus.CONFLICT
+                )
         );
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseBody
-    public ResponseEntity<ApiErrorResponse> handleBadRequestException(
+    public ResponseEntity<ApiResponse> handleBadRequestException(
             ConstraintViolationException e,
             HttpServletRequest request
     ) {
-        return new ResponseEntity<>(
+        return responseBuilder.buildResponse(
+                HttpStatus.NOT_ACCEPTABLE.value(),
+                "Error en la integridad de la DB",
                 contentException(
                         request,
-                        "Debe" +e.getMessage().split(": debe")[1],
+                        "Debe"+e.getMessage().split(": debe")[1],
                         HttpStatus.NOT_ACCEPTABLE.value()
-                ),
-                HttpStatus.NOT_ACCEPTABLE
+                )
         );
     }
 
     @ExceptionHandler(EmailInUseException.class)
     @ResponseBody
-    public ResponseEntity<ApiErrorResponse> handleBadRequestException(
+    public ResponseEntity<ApiResponse> handleBadRequestException(
             EmailInUseException e,
             HttpServletRequest request
     ) {
-        return new ResponseEntity<>(
+        return responseBuilder.buildResponse(
+                HttpStatus.CONFLICT.value(),
+                "El email ya esta registrado",
                 contentException(
                         request,
                         e.getMessage(),
                         HttpStatus.CONFLICT.value()
-                ),
-                HttpStatus.CONFLICT
+                )
         );
     }
 
@@ -154,9 +166,16 @@ public class ApiExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public ErrorDTO processValidationError(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ApiResponse> processValidationError(
+            MethodArgumentNotValidException ex,
+            HttpServletRequest request
+    ) {
         BindingResult result = ex.getBindingResult();
-        return processFieldErrors(result.getFieldErrors());
+        return responseBuilder.buildResponse(
+                HttpStatus.CONFLICT.value(),
+                "Error en la validación de los datos",
+                processFieldErrors(result.getFieldErrors())
+        );
     }
 
     private ErrorDTO processFieldErrors(List<FieldError> errors) {

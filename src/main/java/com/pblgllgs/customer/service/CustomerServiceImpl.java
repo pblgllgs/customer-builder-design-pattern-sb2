@@ -3,6 +3,7 @@ package com.pblgllgs.customer.service;
 import com.pblgllgs.customer.dto.CustomerDto;
 import com.pblgllgs.customer.dto.response.ApiResponse;
 import com.pblgllgs.customer.dto.response.ResponseBuilder;
+import com.pblgllgs.customer.dto.response.ResponseDto;
 import com.pblgllgs.customer.entity.Customer;
 import com.pblgllgs.customer.exception.EmailInUseException;
 import com.pblgllgs.customer.exception.ResourceNotFoundException;
@@ -35,7 +36,7 @@ public class CustomerServiceImpl implements CustomerService {
                         .toList();
         return responseBuilder.buildResponse(
                 HttpStatus.OK.value(),
-                "Customer details",
+                "Customers details",
                 customersDto
         );
     }
@@ -78,7 +79,7 @@ public class CustomerServiceImpl implements CustomerService {
         Customer customerUpdated = customerRepository.save(customerDb);
         return responseBuilder.buildResponse(
                 HttpStatus.OK.value(),
-                "Customer id: " + id + " details",
+                "Customer id: " + id + " updated",
                 modelMapper.map(customerUpdated, CustomerDto.class)
         );
 
@@ -93,10 +94,7 @@ public class CustomerServiceImpl implements CustomerService {
             );
         }
         if (!customerRepository.existsCustomerByEmail(email)) {
-            return responseBuilder.buildResponse(
-                    HttpStatus.NOT_FOUND.value(),
-                    "Customer email: " + email + " details", "No existen coincidencias"
-            );
+            throw new ResourceNotFoundException("Customer with id " + email + " not found");
         }
         Customer customerDb =
                 customerRepository
@@ -116,7 +114,7 @@ public class CustomerServiceImpl implements CustomerService {
         customerRepository.deleteById(customerDb.getId());
         return responseBuilder.buildResponse(
                 HttpStatus.OK.value(),
-                "Customer id: " + customerDb.getId() , "Se ha eliminado exitosamente!"
+                "Customer id: " + customerDb.getId() +" deleted" , new ResponseDto("Operacion realizada con exito",true)
         );
     }
 }
