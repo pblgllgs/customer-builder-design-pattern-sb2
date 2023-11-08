@@ -12,10 +12,10 @@ import org.springframework.context.annotation.Bean;
 import java.time.LocalDate;
 
 @SpringBootApplication
-public class CustomerApplication {
+public class Application {
 
     public static void main(String[] args) {
-        SpringApplication.run(CustomerApplication.class, args);
+        SpringApplication.run(Application.class, args);
     }
 
     private static void generate(int quantity, CustomerService customerService) {

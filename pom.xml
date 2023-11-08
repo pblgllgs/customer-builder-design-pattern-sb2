@@ -8,11 +8,11 @@
 		<version>2.7.14</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.example</groupId>
-	<artifactId>customer</artifactId>
+	<groupId>com.pblgllgs</groupId>
+	<artifactId>validation-handle-exception</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>customer</name>
-	<description>customer</description>
+	<name>validation-handle-exception</name>
+	<description>validation-handle-exception</description>
 	<properties>
 		<java.version>17</java.version>
 	</properties>
